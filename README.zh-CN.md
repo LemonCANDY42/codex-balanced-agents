@@ -74,12 +74,8 @@ python3 install.py install
 
 模型可用性取决于账号、服务提供方与客户端。安装器查询 CLI 公布的模型及推理档位目录，这不等于验证了账号权限或实际推理成功。桌面应用与单独安装的 CLI 可能返回不同目录。
 
-## 参与改进
+## 问题与反馈
 
-两套方案保持相同角色名称与工作边界。修改应能说明对应的任务或失败案例。代码修改后运行：
+遇到安装问题、角色行为不清楚，或有尚未覆盖的使用场景，欢迎[提 Issue](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new)。请尽量说明预期行为、实际结果、Codex 版本，并提供最小示例。发布前请移除凭据与隐私信息。
 
-```bash
-python3 -m unittest discover -s tests -v
-```
-
-维护边界见 [AGENTS.md](AGENTS.md)。采用 [MIT 许可](LICENSE)。
+目前优先通过 Issue 收集反馈。采用 [MIT 许可](LICENSE)。

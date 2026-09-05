@@ -12,6 +12,10 @@ The offline installer suite uses temporary homes and fake model catalogues. It c
 
 两套方案各有 14 个同名角色，仅四个 Luna/Terra 档位不同。安装测试使用临时目录与模拟模型目录，覆盖安装、切换、重复执行、冲突保护、无关配置保留、符号链接、dry run、缺失模型确认、最多两次提问、卸载与写入错误回滚。它们不证明模型推理质量。
 
+The initial release passed the suite on Linux, macOS and Windows. GitHub Actions is now disabled and the workflow has been removed; maintainers run checks locally before publishing.
+
+初始发布已通过 Linux、macOS 和 Windows 测试。当前已关闭 GitHub Actions 并移除 workflow，后续发布前由维护者在本地验证。
+
 Run locally with Python 3.11+:
 
 ```bash

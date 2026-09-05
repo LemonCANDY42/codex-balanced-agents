@@ -75,12 +75,8 @@ Role instructions do not create a security boundary. In the Codex versions exami
 
 Model availability depends on your account, provider and client. The installer checks the CLI's advertised model/effort catalogue; that is not an entitlement or successful-inference test. The app and a separately installed CLI may expose different catalogues.
 
-## Contributing
+## Feedback
 
-Keep role names and boundaries aligned between presets. Explain changes with a concrete task or failure case. For code changes, run:
+Found an installation problem, confusing role behavior, or a use case this setup does not cover? [Open an Issue](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new). Include the expected behavior, what happened, your Codex version, and a minimal example when possible. Remove credentials and private information before posting.
 
-```bash
-python3 -m unittest discover -s tests -v
-```
-
-See [AGENTS.md](AGENTS.md) for repository maintenance boundaries. [MIT licensed](LICENSE).
+Feedback is currently collected through Issues. [MIT licensed](LICENSE).
