@@ -84,6 +84,8 @@ python3 install.py install
 
 模型可用性取决于账号、服务提供方与客户端。安装器查询 CLI 公布的模型及推理档位目录，这不等于验证了账号权限或实际推理成功。桌面应用与单独安装的 CLI 可能返回不同目录。
 
+后续会根据模型能力与实际使用体验，持续优化角色分级、模型选择和推理档位，并结合调用分布、任务完成情况、返工与耗时调整。[后续优化思路 →](docs/design.md#how-the-tiers-will-evolve--后续优化与分级)
+
 ## 问题与反馈
 
 遇到安装问题、角色行为不清楚，或有尚未覆盖的使用场景，欢迎[选择 Issue 模板](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new/choose)：问题报告、改进建议或使用疑问。模板字段与提示统一使用英文，内容仍可用中文或英文填写。通过 agent、CLI 或 API 提交时，请按[提交指南](docs/issues.md)填写相同字段。发布前请移除凭据与隐私信息。

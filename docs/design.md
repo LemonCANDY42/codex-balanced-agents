@@ -30,6 +30,18 @@ The 14 names make escalation choices visible. They are not a target number of ag
 
 14 个名称让选择与升级路径可见，不代表每次要启动 14 个代理。紧密耦合的任务保持单一负责人，优先考虑可独立验证的调查工作。
 
+## How the tiers will evolve / 后续优化与分级
+
+The author will continue revising role tiers, model choices and reasoning defaults as model capabilities and hands-on experience change. Usage distribution is one input: it can show which roles are selected in everyday work and how often stronger roles are called. It does not establish task difficulty, success, quality or savings. Changes should also consider whether the task was completed, the amount of rework, latency and unnecessary scope expansion.
+
+作者会根据模型能力的变化和实际使用体验，持续优化角色分级、模型选择与默认推理档位。调用分布是参考之一，可以看出日常工作中各角色的使用情况，以及更强角色被调用的频率，但不能据此判定任务难度、成功率、质量或节省了多少成本。调整时也会结合任务完成情况、返工、耗时和不必要的范围扩张。
+
+See the [2026-09-05 personal usage snapshot](usage-2026-09-05.md) for a first descriptive reference, with its counting method and limits. / 第一份参考见 [2026-09-05 个人使用记录](usage-2026-09-05.md)，其中列明统计口径与限制。
+
+These are maintainer-led configuration updates. Installed roles remain fixed until the user explicitly updates or changes them; the package does not collect usage data or adjust models in the background.
+
+这些优化由维护者更新配置实现。已安装角色保持固定，直到用户主动更新或修改；本项目不会收集使用数据，也不会在后台自动调整模型。
+
 ## Official basis / 官方依据
 
 [OpenAI's subagent guidance](https://developers.openai.com/codex/subagents) recommends narrow agents, clear tool and task boundaries, and different models/efforts for different work. It also notes that delegation consumes additional tokens and that parallel writes need care. The principles fit this design; the exact 14-role matrix is a personal choice, not an official recommendation.

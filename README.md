@@ -85,6 +85,8 @@ Role instructions do not create a security boundary. In the Codex versions exami
 
 Model availability depends on your account, provider and client. The installer checks the CLI's advertised model/effort catalogue; that is not an entitlement or successful-inference test. The app and a separately installed CLI may expose different catalogues.
 
+The role tiers, model choices and reasoning defaults will evolve with model capabilities and hands-on experience, considering completion, rework and latency alongside usage patterns. [How the tiers will evolve →](docs/design.md#how-the-tiers-will-evolve--后续优化与分级)
+
 ## Feedback
 
 Found an installation problem, confusing role behavior, or a use case this setup does not cover? [Choose an issue template](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new/choose): bug report, improvement, or question. All templates use English field names and prompts; responses may be in English or Chinese. For agent, CLI or API submissions, follow the same fields in the [issue guide](docs/issues.md). Remove credentials and private information before posting.
