@@ -76,6 +76,6 @@ python3 install.py install
 
 ## 问题与反馈
 
-遇到安装问题、角色行为不清楚，或有尚未覆盖的使用场景，欢迎[提 Issue](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new)。请尽量说明预期行为、实际结果、Codex 版本，并提供最小示例。发布前请移除凭据与隐私信息。
+遇到安装问题、角色行为不清楚，或有尚未覆盖的使用场景，欢迎[选择 Issue 模板](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new/choose)：问题报告、改进建议或使用疑问。每个表单都有中英双语提示。通过 agent、CLI 或 API 提交时，请按[提交指南](docs/issues.md)填写相同字段。发布前请移除凭据与隐私信息。
 
 目前优先通过 Issue 收集反馈。采用 [MIT 许可](LICENSE)。

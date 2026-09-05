@@ -1,0 +1,67 @@
+name: Bug report / 问题报告
+description: Report an installation or role behavior problem / 报告安装或角色行为问题
+title: '[Bug] '
+body:
+- type: markdown
+  attributes:
+    value: 'English or 中文 is welcome. Use a specific title and keep one topic per issue.
+
+      欢迎使用中文或英文；标题请说明具体问题，每条 Issue 聚焦一个主题。
+
+
+      Search existing issues first. Remove credentials, private paths and private project content; include
+      only the smallest relevant excerpt.
+
+      请先搜索已有 Issue。移除凭据、私人路径和私有项目内容，只提供必要的最小片段。
+
+
+      Submitting through an agent, CLI or API? Follow the same headings in [the issue guide](https://github.com/LemonCANDY42/codex-balanced-agents/blob/main/docs/issues.md).
+      Mark unknown facts explicitly; do not invent results.
+
+      通过 agent、CLI 或 API 提交时，请遵循[提交指南](https://github.com/LemonCANDY42/codex-balanced-agents/blob/main/docs/issues.md)中的相同标题。不确定的信息请明确标注，不要编造结果。'
+- type: textarea
+  id: summary
+  attributes:
+    label: Problem / 问题
+    description: What failed and how does it affect your task? / 什么出了问题，对任务有什么影响？
+  validations:
+    required: true
+- type: textarea
+  id: environment
+  attributes:
+    label: Environment / 环境
+    description: OS; Codex app or CLI and version; repository commit or download date; Quality/Balanced;
+      affected role/model/effort. Include Python version for installer issues. Write unknown where needed;
+      omit private paths. / 系统、Codex 客户端类型与版本、仓库提交或下载日期、配置方案、涉及的角色/模型/推理档位。安装问题补充 Python 版本；未知项请注明，勿附私人路径。
+  validations:
+    required: true
+- type: textarea
+  id: reproduction
+  attributes:
+    label: Steps to reproduce / 复现步骤
+    description: Numbered steps, minimal command or sanitized prompt, and relevant customization. If intermittent
+      or not reproducible, say so and describe when it occurred. / 编号步骤、最小命令或脱敏提示词，以及相关自定义改动；偶发或无法复现时请说明发生条件。
+  validations:
+    required: true
+- type: textarea
+  id: expected
+  attributes:
+    label: Expected behavior / 预期行为
+    description: What should happen? Link the relevant documentation if available. / 你预期发生什么？如有相关文档，请附链接。
+  validations:
+    required: true
+- type: textarea
+  id: actual
+  attributes:
+    label: Actual behavior and evidence / 实际行为与证据
+    description: What did you observe? Include a minimal redacted error/output or screenshot if available.
+      Separate observations from suspected causes; do not paste full session logs. / 实际观察到什么？可附最小脱敏报错、输出或截图。区分事实与原因推测，不要粘贴完整会话日志。
+  validations:
+    required: true
+- type: textarea
+  id: workaround
+  attributes:
+    label: Workaround / 临时解决办法
+    description: What have you tried, and what happened? / 尝试了什么，结果如何？
+  validations:
+    required: false

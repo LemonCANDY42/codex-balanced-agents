@@ -11,3 +11,4 @@ This repository ships two personal Codex role presets and a non-clobbering insta
 - Use targeted temporary-directory tests for the installer. Run `python3 -m unittest discover -s tests -v` before publishing changes. Live model tests are separate from offline tests and should have bounded synthetic prompts.
 - Use an independent read-only review after non-trivial installer or role-boundary changes. Reviewers do not edit or delegate; the lead owns follow-up and acceptance.
 - Keep public feedback focused on GitHub Issues; do not add contribution or pull-request invitations. GitHub Actions is disabled; keep verification local unless the owner requests otherwise.
+- For issue preparation or submission, read `docs/issues.md` and the matching `.github/ISSUE_TEMPLATE/*.yml` form. Use its field labels and required fields for CLI/API bodies too; identify unknown or unverified facts instead of inventing evidence. Keep the bilingual feedback links synchronized.

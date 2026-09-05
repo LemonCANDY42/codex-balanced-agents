@@ -1,0 +1,58 @@
+name: Improvement / 改进建议
+description: Suggest a focused change to roles, installation or docs / 建议改进角色、安装或文档
+title: '[Idea] '
+body:
+- type: markdown
+  attributes:
+    value: 'English or 中文 is welcome. Use a specific title and keep one topic per issue.
+
+      欢迎使用中文或英文；标题请说明具体问题，每条 Issue 聚焦一个主题。
+
+
+      Search existing issues first. Remove credentials, private paths and private project content; include
+      only the smallest relevant excerpt.
+
+      请先搜索已有 Issue。移除凭据、私人路径和私有项目内容，只提供必要的最小片段。
+
+
+      Submitting through an agent, CLI or API? Follow the same headings in [the issue guide](https://github.com/LemonCANDY42/codex-balanced-agents/blob/main/docs/issues.md).
+      Mark unknown facts explicitly; do not invent results.
+
+      通过 agent、CLI 或 API 提交时，请遵循[提交指南](https://github.com/LemonCANDY42/codex-balanced-agents/blob/main/docs/issues.md)中的相同标题。不确定的信息请明确标注，不要编造结果。'
+- type: textarea
+  id: need
+  attributes:
+    label: Use case and problem / 使用场景与问题
+    description: Describe a concrete task and the limitation you encountered. / 描述具体任务和遇到的限制。
+  validations:
+    required: true
+- type: textarea
+  id: outcome
+  attributes:
+    label: Desired outcome / 期望结果
+    description: What should become possible or clearer? / 希望能做到什么，或让什么更清楚？
+  validations:
+    required: true
+- type: textarea
+  id: proposal
+  attributes:
+    label: Suggested change / 改进建议
+    description: 'Describe the smallest useful change. A solution is optional: write "unsure" if you only
+      know the problem. / 描述最小有用改动；不要求已有方案，尚不清楚时可写“待讨论”。'
+  validations:
+    required: true
+- type: textarea
+  id: acceptance
+  attributes:
+    label: Acceptance example / 验收示例
+    description: Give a concrete example showing the improvement works. / 给出一个能判断改进是否有效的具体例子。
+  validations:
+    required: true
+- type: textarea
+  id: alternatives
+  attributes:
+    label: Alternatives and tradeoffs / 替代方案与取舍
+    description: Existing approaches tried, related issues, compatibility concerns or extra setup cost.
+      / 已尝试的方式、相关 Issue、兼容性顾虑或额外配置成本。
+  validations:
+    required: false

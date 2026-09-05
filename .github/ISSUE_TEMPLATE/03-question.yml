@@ -1,0 +1,44 @@
+name: Question / 使用疑问
+description: Ask about usage or unclear documentation / 询问用法或不清楚的文档
+title: '[Question] '
+body:
+- type: markdown
+  attributes:
+    value: 'English or 中文 is welcome. Use a specific title and keep one topic per issue.
+
+      欢迎使用中文或英文；标题请说明具体问题，每条 Issue 聚焦一个主题。
+
+
+      Search existing issues first. Remove credentials, private paths and private project content; include
+      only the smallest relevant excerpt.
+
+      请先搜索已有 Issue。移除凭据、私人路径和私有项目内容，只提供必要的最小片段。
+
+
+      Submitting through an agent, CLI or API? Follow the same headings in [the issue guide](https://github.com/LemonCANDY42/codex-balanced-agents/blob/main/docs/issues.md).
+      Mark unknown facts explicitly; do not invent results.
+
+      通过 agent、CLI 或 API 提交时，请遵循[提交指南](https://github.com/LemonCANDY42/codex-balanced-agents/blob/main/docs/issues.md)中的相同标题。不确定的信息请明确标注，不要编造结果。'
+- type: textarea
+  id: question
+  attributes:
+    label: Question and goal / 疑问与目标
+    description: What are you trying to do, and what is unclear? / 想完成什么，哪里不清楚？
+  validations:
+    required: true
+- type: textarea
+  id: context
+  attributes:
+    label: Relevant context / 相关背景
+    description: Link the doc or role; include preset and client/version if relevant. Write unknown or
+      not applicable where needed. / 附相关文档或角色；如有关联，请说明方案、客户端与版本。未知或不适用请注明。
+  validations:
+    required: true
+- type: textarea
+  id: attempts
+  attributes:
+    label: What you checked or tried / 已查阅或尝试
+    description: Relevant docs, existing issues or a minimal sanitized example; say if you have not tried
+      anything yet. / 已查阅的文档、已有 Issue 或最小脱敏示例；尚未尝试也可明确说明。
+  validations:
+    required: true
