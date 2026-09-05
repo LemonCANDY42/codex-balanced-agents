@@ -12,9 +12,19 @@ This package keeps the main agent responsible for the task and gives children bo
 
 ## Two presets, one behavior contract / 两套方案，同一套边界
 
-Quality retains the author's deeper Luna/Terra settings. Balanced changes those four roles to medium, while preserving Sol and Astra settings for denser or more uncertain work. This provides an explicit choice without maintaining two competing workflows. It does not establish that either preset wins on a particular task.
+Quality retains the author's prior `xhigh` defaults for four Luna/Terra roles. Balanced sets those same roles to `medium`, while preserving the Sol, Astra and planning defaults. Quality and Balanced are names for these two sets of defaults; they do not describe a measured winner. The lead model is outside the package and is unchanged.
 
-Quality 保留作者原先对 Luna/Terra 使用更多推理的设置；Balanced 将四个日常角色调为 medium，保留较复杂工作的 Sol/Astra 档位。两套共享工作方式，不维护两份不同的流程，也不预先声称哪套效果更好。
+Quality 保留作者原先四个 Luna/Terra 角色的 `xhigh` 默认值；Balanced 将这四个角色设为 `medium`，同时保留 Sol、Astra 与规划角色的默认值。Quality 和 Balanced 是这两套默认值的名称，不代表已测得哪一套更好。主代理模型不属于本项目配置，也不会被改变。
+
+For every delegation, the lead selects the role from the task's evidence. That role's model and effort are fixed together in the selected role file, but model and effort remain separate dimensions of the configuration. This package has a selection guide, not an adaptive-effort controller or runtime router; matching Explore and Worker defaults never require matching selections.
+
+每次委派时，主代理根据任务证据选择角色。被选中角色文件会一并固定模型和推理档位，但模型与推理档位仍是配置中的两个独立维度。本项目只有选择指南，没有自适应推理控制器或运行时路由器；调查与实现角色默认值相同，也不要求两者选择保持一致。
+
+### Author's motivation / 作者的观察
+
+For bounded research or implementation with a capable lead and clear instructions, the author has often found that higher effort takes longer without a noticeable gain. In personal GPT-5.6 use, a larger model or higher effort has sometimes expanded scope, added excessive testing, or introduced regressions. These are anecdotal observations that motivated the two presets, not a benchmark result or a general claim about models or effort.
+
+在主代理能力足够且指令清楚的范围明确的调研或实现中，作者常观察到更高推理档位耗时更长，却没有明显收益。在个人使用 GPT-5.6 的过程中，更大的模型或更高推理档位有时会扩大范围、加入过多测试，或引入回归。这些只是促成两套预设的个人观察，不是基准结果，也不是关于模型或推理档位的普遍结论。
 
 The 14 names make escalation choices visible. They are not a target number of agents per run. Keep tightly coupled work with one owner, and delegate independent evidence collection before parallelizing edits.
 

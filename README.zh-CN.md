@@ -2,7 +2,7 @@
 
 [English](README.md) · [安装](INSTALL.zh-CN.md) · [角色说明](docs/roles.md) · [验证记录](docs/verification.md)
 
-**一套个人使用的 Codex 分工配置：根据任务，决定投入多少推理。**
+**一套个人使用的 Codex 配置：按任务选择子代理，让分工更清楚。**
 
 明确的小任务交给轻量模型；逻辑密集的实现交给有明确边界的 Worker；复杂、模糊的问题交给更深入的调查角色。完成后，再让独立 Reviewer 对照原需求检查。
 
@@ -10,16 +10,11 @@
 
 ![架构：主代理负责范围、委派、整合与最终验收；Explore、Plan、Worker、Review 各自返回有界结果。Quality 和 Balanced 保留同一套角色，调整日常任务的推理投入。](assets/architecture.png)
 
-## 选择适合你的方案
+## 从任务出发
 
-| | Quality · 质量优先 | Balanced · 质量与成本均衡 |
-| --- | --- | --- |
-| Luna 调查／实现角色 | `xhigh` | `medium` |
-| Terra 调查／实现角色 | `xhigh` | `medium` |
-| Sol、Astra 与规划角色 | 两套相同 | 两套相同 |
-| 设计意图 | 日常委派工作也投入更多推理 | 日常委派工作从适中推理开始 |
+没有明确偏好时，建议从 **Balanced** 开始：四个日常 Luna/Terra 调查与实现角色的默认推理档位为 `medium`；**Quality** 保留它们的 `xhigh` 默认档位。其余角色名称、指令、升级路径与工作边界完全相同。名称用于区分预设，不代表已测得的质量、费用或速度优势。
 
-没有明确偏好时，建议从 **Balanced** 开始。如果更愿意为日常角色投入推理，并接受可能增加的耗时和用量，可以选 **Quality**。名称描述的是配置取向，不代表已经验证的质量差异。两套保留相同的升级路径与工作边界。[完整角色表 →](docs/roles.md)
+每次委派都应按当前要交付的结果重新选择角色。安装后的角色文件固定了模型和默认推理档位；本项目没有自适应推理机制或后台路由器。调查角色与实现角色恰好有相同默认值，并不要求不同阶段选择相同模型或推理档位；安装任一预设也不会改变主代理模型。[查看角色选择与完整默认值 →](docs/roles.md)
 
 ## 让 agent 帮你安装
 
@@ -63,7 +58,8 @@ python3 install.py install
 
 ```text
 使用 $codex-balanced-agents 处理这个 bug。
-先让 explore_terra 找到归属代码并返回证据，再视需要安排范围明确的 Worker。
+需要结合几处代码查清原因时，先让 explore_terra 调查并返回证据。
+若确认只需一项明确的小改动，再让 worker_luna 实现并验证。
 完成后让 reviewer_sol 对照原需求审查 diff。
 由你负责整合与最终验收，保留无关改动。
 ```
@@ -93,3 +89,5 @@ python3 install.py install
 遇到安装问题、角色行为不清楚，或有尚未覆盖的使用场景，欢迎[选择 Issue 模板](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new/choose)：问题报告、改进建议或使用疑问。模板字段与提示统一使用英文，内容仍可用中文或英文填写。通过 agent、CLI 或 API 提交时，请按[提交指南](docs/issues.md)填写相同字段。发布前请移除凭据与隐私信息。
 
 目前优先通过 Issue 收集反馈。采用 [MIT 许可](LICENSE)。
+
+社区交流：[LINUX DO](https://linux.do/)，交流开发思路与使用经验。

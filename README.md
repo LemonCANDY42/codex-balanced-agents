@@ -2,7 +2,7 @@
 
 [中文](README.zh-CN.md) · [Install](INSTALL.md) · [Role guide](docs/roles.md) · [Verification](docs/verification.md)
 
-**A personal Codex setup for choosing how much reasoning a task needs.**
+**A personal Codex setup for matching subagents to the task.**
 
 Small, clear jobs go to lighter models. Dense implementation gets a bounded Worker. Ambiguous problems get deeper investigation. A separate Reviewer checks the candidate against the original request.
 
@@ -10,16 +10,11 @@ This repository packages that approach as **14 native Codex roles, two presets, 
 
 ![Architecture: the lead owns scope and final acceptance; Explore, Plan, Worker and Review return bounded results. Quality and Balanced use the same roles with different routine reasoning effort.](assets/architecture.png)
 
-## Pick your tradeoff
+## Start with the task
 
-| | Quality | Balanced |
-| --- | --- | --- |
-| Luna Explore / Worker | `xhigh` | `medium` |
-| Terra Explore / Worker | `xhigh` | `medium` |
-| Sol, Astra and planning roles | Same in both presets | Same in both presets |
-| Intent | Spend more reasoning on routine delegated work | Start routine delegated work at moderate effort |
+Start with **Balanced** if you do not have a preference. It gives the four routine Luna/Terra Explore and Worker roles a `medium` reasoning-effort default; **Quality** retains their `xhigh` defaults. The presets otherwise install the same role names, instructions, escalation paths and scope boundaries. The names describe preset choices, not measured quality, cost or speed.
 
-Start with **Balanced** if you do not have a preference. Choose **Quality** if you prefer more reasoning for routine roles and accept the extra potential latency and usage. These labels describe configuration choices, not measured superiority. Both presets retain the same escalation paths and scope boundaries. [Full matrix →](docs/roles.md)
+Choose the role again for each delegated outcome. An installed role has a fixed model and reasoning-effort default; this package has no adaptive-effort mechanism or router. Matching Explore and Worker defaults do not require the same model or effort choice across phases, and installing either preset does not change the lead model. [How to read the exact defaults and select a role →](docs/roles.md)
 
 ## Install with your agent
 
@@ -64,7 +59,8 @@ After installation, restart your Codex client and try:
 
 ```text
 Use $codex-balanced-agents for this bug. Have explore_terra locate the owning
-code and return evidence. Then assign a bounded Worker if useful.
+code and return evidence when bounded synthesis is needed. If it establishes a
+clear mechanical edit, have worker_luna implement only that edit and validate it.
 Have reviewer_sol inspect the finished diff against the original requirement.
 Keep integration and final acceptance with you. Preserve unrelated changes.
 ```
@@ -94,3 +90,5 @@ Model availability depends on your account, provider and client. The installer c
 Found an installation problem, confusing role behavior, or a use case this setup does not cover? [Choose an issue template](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new/choose): bug report, improvement, or question. All templates use English field names and prompts; responses may be in English or Chinese. For agent, CLI or API submissions, follow the same fields in the [issue guide](docs/issues.md). Remove credentials and private information before posting.
 
 Feedback is currently collected through Issues. [MIT licensed](LICENSE).
+
+Community: [LINUX DO](https://linux.do/) — a place to exchange development ideas and experience.
