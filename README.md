@@ -91,6 +91,6 @@ Model availability depends on your account, provider and client. The installer c
 
 ## Feedback
 
-Found an installation problem, confusing role behavior, or a use case this setup does not cover? [Choose an issue template](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new/choose): bug report, improvement, or question. Each form includes English and Chinese prompts. For agent, CLI or API submissions, follow the same fields in the [issue guide](docs/issues.md). Remove credentials and private information before posting.
+Found an installation problem, confusing role behavior, or a use case this setup does not cover? [Choose an issue template](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new/choose): bug report, improvement, or question. All templates use English field names and prompts; responses may be in English or Chinese. For agent, CLI or API submissions, follow the same fields in the [issue guide](docs/issues.md). Remove credentials and private information before posting.
 
 Feedback is currently collected through Issues. [MIT licensed](LICENSE).

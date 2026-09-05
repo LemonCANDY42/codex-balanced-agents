@@ -2,9 +2,9 @@
 
 [Open the issue chooser / 选择 Issue 类型](https://github.com/LemonCANDY42/codex-balanced-agents/issues/new/choose)
 
-Use English or Chinese. Pick **Bug report**, **Improvement**, or **Question**. Give the issue a specific title (for example, `[Bug] Balanced install stops on an unmanaged role file`) and keep one topic per issue. Search existing issues first and add new evidence there when it is the same problem.
+Templates use English field names and prompts; responses may be in English or Chinese. Pick **Bug report**, **Improvement**, or **Question**. Give the issue a specific title (for example, `[Bug] Balanced install stops on an unmanaged role file`) and keep one topic per issue. Search existing issues first and add new evidence there when it is the same problem.
 
-可用中文或英文。选择**问题报告**、**改进建议**或**使用疑问**，标题说明具体问题（例如 `[Bug] 安装 Balanced 时遇到非托管角色文件后停止`），每条 Issue 聚焦一个主题。先搜索已有 Issue；如果是相同问题，请在原帖补充新证据。
+模板字段与提示统一使用英文，内容可用中文或英文填写。选择**问题报告**、**改进建议**或**使用疑问**，标题说明具体问题（例如 `[Bug] 安装 Balanced 时遇到非托管角色文件后停止`），每条 Issue 聚焦一个主题。先搜索已有 Issue；如果是相同问题，请在原帖补充新证据。
 
 Provide facts you observed. Mark unknowns, hypotheses and untested suggestions explicitly. A minimal example is enough; a complete root-cause analysis is not required. Remove credentials, private paths, account identifiers and private project content before posting. Do not attach full configuration files or session logs.
 
@@ -12,7 +12,7 @@ Provide facts you observed. Mark unknowns, hypotheses and untested suggestions e
 
 ## Agents, CLI and API / 通过 agent、CLI 或 API 提交
 
-The YAML forms in [`.github/ISSUE_TEMPLATE`](../.github/ISSUE_TEMPLATE) are the source of truth for field names, prompts and required fields. GitHub's web form asks for these fields; CLI/API submissions can bypass the form. When using those routes, read the appropriate YAML file and write a Markdown body with `### <label>` for each field, in form order. Fill every required field; use `Unknown / 未知` or `Not applicable / 不适用` with a brief reason when appropriate. Optional fields may be omitted. The introductory `markdown` block is guidance, not a response field.
+The YAML forms in [`.github/ISSUE_TEMPLATE`](../.github/ISSUE_TEMPLATE) are the source of truth for field names, prompts and required fields. GitHub's web form asks for these fields; CLI/API submissions can bypass the form. When using those routes, read the appropriate YAML file and write a Markdown body with `### <label>` for each field, in form order. Fill every required field; use `Unknown` or `Not applicable` with a brief reason when appropriate. Optional fields may be omitted. The introductory `markdown` block is guidance, not a response field.
 
 [`.github/ISSUE_TEMPLATE`](../.github/ISSUE_TEMPLATE) 中的 YAML 表单是字段名称、提示和必填要求的唯一来源。网页表单会引导填写，CLI/API 则可能绕过表单。使用这些途径时，先读取对应 YAML，按字段顺序以 `### <label>` 写 Markdown 正文。填写所有必填项；未知或不适用时请注明并简述原因。选填项可省略，开头的 `markdown` 块是说明，无需当作回答字段。
 
