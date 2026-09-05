@@ -43,6 +43,20 @@ python3 install.py install
 
 安装器只把角色文件和一个使用技能写入 Codex 配置目录；不会覆盖主模型、`config.toml`、全局 `AGENTS.md`、认证或 MCP。遇到不归它管理的同名文件会停止，即使内容相同也不会擅自接管。[安装、切换与卸载 →](INSTALL.zh-CN.md)
 
+## 让 agent 一键卸载
+
+把下面这段发给 Codex：
+
+```text
+读取 https://raw.githubusercontent.com/LemonCANDY42/codex-balanced-agents/main/UNINSTALL.zh-CN.md
+并从安装时使用的 Codex 目录卸载 Codex Balanced Agents。
+先预览确切删除清单，再仅删除通过归属与完整性检查的本项目文件。
+保留无关配置和用户修改；遇到冲突就停止。
+```
+
+也可在本仓库执行：`python3 install.py uninstall --yes`。
+使用 `--dry-run` 可只预览、不改动。[删除边界与恢复说明 →](UNINSTALL.zh-CN.md)
+
 ## 实际使用
 
 安装后重新启动 Codex 客户端，可以这样开始：

@@ -275,6 +275,141 @@ class InstallerTest(unittest.TestCase):
         self.assertFalse(manifest["installed"])
         self.assertEqual(manifest["files"], [])
 
+    def snapshot(self) -> dict[str, bytes]:
+        return {str(p.relative_to(self.home)): p.read_bytes()
+                for p in self.home.rglob("*") if p.is_file()}
+
+    def test_uninstall_preview_cancel_repeat_and_reinstall(self) -> None:
+        self.assertEqual(self.install("balanced")[0], 0)
+        unrelated = {
+            "config.toml": b"main configuration",
+            "AGENTS.md": b"global instructions",
+            "auth.json": b"synthetic auth fixture",
+            "mcp.json": b"synthetic mcp fixture",
+            "agents/local.toml": b"local role",
+            "skills/other/SKILL.md": b"other skill",
+            "skills/codex-balanced-agents/my-notes.txt": b"personal notes",
+            "codex-balanced-agents/backups/keep.txt": b"backup fixture",
+        }
+        for relative, content in unrelated.items():
+            target = self.home / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(content)
+        before = self.snapshot()
+        with mock.patch.object(installer, "_confirm", side_effect=AssertionError("no prompt")):
+            code, out, err = self.invoke("uninstall", "--dry-run", "--codex-home", str(self.home))
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn("remove agents/worker_astra.toml", out)
+        self.assertEqual(self.snapshot(), before)
+        with mock.patch.object(installer, "_confirm", return_value=False):
+            self.assertEqual(self.invoke("uninstall", "--codex-home", str(self.home))[0], 2)
+        self.assertEqual(self.snapshot(), before)
+        self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 0)
+        for relative, content in unrelated.items():
+            self.assertEqual((self.home / relative).read_bytes(), content)
+        after = self.snapshot()
+        self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 0)
+        self.assertEqual(self.snapshot(), after)
+        # An unmanaged directory remaining after uninstall is deliberately not adopted.
+        self.assertEqual(self.install("balanced")[0], 2)
+
+    def test_uninstall_reinstall_without_custom_skill_files(self) -> None:
+        self.assertEqual(self.install("quality")[0], 0)
+        self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 0)
+        self.assertEqual(self.install("balanced")[0], 0)
+
+    def test_uninstall_rejects_unrelated_manifest_entry(self) -> None:
+        self.assertEqual(self.install("balanced")[0], 0)
+        target = self.home / "agents/local.toml"
+        target.write_bytes(b"unrelated role")
+        manifest = self.home / installer.STATE_DIR_NAME / "manifest.json"
+        data = json.loads(manifest.read_bytes())
+        data["files"].append({"path": "agents/local.toml", "sha256": installer.sha256_bytes(target.read_bytes())})
+        manifest.write_text(json.dumps(data))
+        before = self.snapshot()
+        code, _, err = self.invoke("uninstall", "--yes", "--codex-home", str(self.home))
+        self.assertEqual(code, 2)
+        self.assertIn("not in this package", err)
+        self.assertEqual(self.snapshot(), before)
+
+    def test_uninstall_rechecks_after_confirmation(self) -> None:
+        self.assertEqual(self.install("balanced")[0], 0)
+        target = self.home / "agents/worker_astra.toml"
+        def change_file(prompt: str) -> bool:
+            target.write_bytes(b"user change while reviewing")
+            return True
+        with mock.patch.object(installer, "_confirm", side_effect=change_file):
+            code, _, _ = self.invoke("uninstall", "--codex-home", str(self.home))
+        self.assertEqual(code, 2)
+        self.assertEqual(target.read_bytes(), b"user change while reviewing")
+        self.assertEqual(len(list((self.home / "agents").glob("*.toml"))), 14)
+
+    def test_uninstall_preserves_concurrently_changed_manifest(self) -> None:
+        self.assertEqual(self.install("balanced")[0], 0)
+        manifest = self.home / installer.STATE_DIR_NAME / "manifest.json"
+        before = self.snapshot()
+        original = installer._assert_uninstall_current
+        count = 0
+        replacement = b'{"external": "change"}'
+        def change_before_commit(home, state, allowed):
+            nonlocal count
+            count += 1
+            if count == 17:  # initial check + 15 removals + commit check
+                manifest.write_bytes(replacement)
+            original(home, state, allowed)
+        with mock.patch.object(installer, "_assert_uninstall_current", side_effect=change_before_commit):
+            code, _, err = self.invoke("uninstall", "--yes", "--codex-home", str(self.home))
+        self.assertEqual(code, 2)
+        self.assertIn("were restored", err)
+        before[f"{installer.STATE_DIR_NAME}/manifest.json"] = replacement
+        self.assertEqual(self.snapshot(), before)
+
+    def test_uninstall_write_failure_restores_deleted_files(self) -> None:
+        self.assertEqual(self.install("balanced")[0], 0)
+        before = self.snapshot()
+        with mock.patch.object(installer, "_atomic_write", side_effect=OSError("disk full")):
+            code, _, err = self.invoke("uninstall", "--yes", "--codex-home", str(self.home))
+        self.assertEqual(code, 2)
+        self.assertIn("were restored", err)
+        self.assertEqual(self.snapshot(), before)
+
+    def test_uninstall_rollback_preserves_replacement_file(self) -> None:
+        self.assertEqual(self.install("balanced")[0], 0)
+        target = self.home / "agents/worker_astra.toml"
+        def fail_commit(path, content):
+            target.write_bytes(b"new user file")
+            raise OSError("commit failed")
+        with mock.patch.object(installer, "_atomic_write", side_effect=fail_commit):
+            code, _, err = self.invoke("uninstall", "--yes", "--codex-home", str(self.home))
+        self.assertEqual(code, 2)
+        self.assertIn("rollback incomplete", err)
+        self.assertEqual(target.read_bytes(), b"new user file")
+        self.assertTrue((self.home / installer.SKILL_REL).is_file())
+
+    def test_uninstall_missing_file_fails_before_deletion(self) -> None:
+        self.assertEqual(self.install("balanced")[0], 0)
+        (self.home / "agents/worker_astra.toml").unlink()
+        before = self.snapshot()
+        self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 2)
+        self.assertEqual(self.snapshot(), before)
+
+    @unittest.skipIf(os.name == "nt", "symlinks may require Windows privileges")
+    def test_uninstall_rejects_symlinked_destination_and_state(self) -> None:
+        self.assertEqual(self.install("balanced")[0], 0)
+        for relative in ["agents", "skills", "skills/codex-balanced-agents",
+                         "agents/worker_astra.toml", "codex-balanced-agents",
+                         "codex-balanced-agents/manifest.json"]:
+            with self.subTest(relative=relative):
+                target = self.home / relative
+                moved = self.root / "outside"
+                target.rename(moved)
+                target.symlink_to(moved, target_is_directory=moved.is_dir())
+                before = self.snapshot()
+                self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 2)
+                self.assertEqual(self.snapshot(), before)
+                target.unlink()
+                moved.rename(target)
+
     def test_update_rolls_back_if_write_fails(self) -> None:
         self.assertEqual(self.install("quality")[0], 0)
         sources, _ = installer.load_preset("balanced")

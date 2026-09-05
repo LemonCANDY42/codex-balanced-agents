@@ -77,4 +77,6 @@ python3 install.py uninstall
 
 Uninstall removes only unchanged managed role/skill files and retains backups plus an inactive manifest. If you have edited a managed file, save your customization elsewhere and resolve the reported conflict deliberately; the installer will not overwrite or delete it for you. Do not delete the ownership manifest to force an update.
 
+For one-command removal, agent instructions, preview and exact preservation boundaries, see [Uninstall](UNINSTALL.md).
+
 For a project-only setup, manually copy one preset's TOML files into `.codex/agents/` and the routing skill into `.agents/skills/`. This manual path is not tracked by the global installer. Check the project's trust settings and use its normal version-control process.

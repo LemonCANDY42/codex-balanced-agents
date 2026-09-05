@@ -480,7 +480,8 @@ def _validate_existing_owned_files(home: Path, state: ManagedState) -> None:
         content = _require_regular_file(target, f"managed file {relative}")
         if sha256_bytes(content) != digest:
             raise ConflictError(
-                f"managed file was modified: {target}; restore it or remove the installer state manually"
+                f"managed file was modified: {target}; preserve your customization and resolve the conflict; "
+                "do not delete the ownership manifest"
             )
 
 
@@ -788,45 +789,79 @@ def _uninstalled_manifest_bytes(preset: str) -> bytes:
     return _manifest_bytes(preset, {}, installed=False)
 
 
+def _uninstall_allowed_paths() -> set[str]:
+    # The manifest is an ownership record, not authority to name arbitrary roles.
+    # Layout validation does not query Codex or require model access.
+    layouts = _validate_source_layout()
+    return {f"agents/{path.name}" for path in layouts["balanced"]} | {SKILL_REL}
+
+
+def _assert_uninstall_current(home: Path, state: ManagedState, allowed: set[str]) -> None:
+    _assert_destination_layout(home, state)
+    current = _read_manifest(home, allowed)
+    if current.raw != state.raw:
+        raise ConflictError("owner manifest changed during uninstall")
+
+
 def command_uninstall(args: argparse.Namespace) -> int:
     home = normalize_home(args.codex_home)
-    state = _read_manifest(home)
+    allowed = _uninstall_allowed_paths()
+    state = _read_manifest(home, allowed)
     if not state.exists or not state.installed:
         print("uninstall: nothing installed")
         return 0
     _assert_destination_layout(home, state)
     _validate_existing_owned_files(home, state)
-    if not args.yes and not _confirm(f"Remove preset {state.preset} from {home}? [y/N]: "):
+    print(f"Uninstall preset {state.preset} from {home}:")
+    for relative in sorted(state.files):
+        print(f"  remove {relative}")
+    print("Keep unrelated files, backups and an inactive ownership manifest.")
+    if args.dry_run:
+        print("dry run: no files changed")
+        return 0
+    if not args.yes and not _confirm("Remove these verified files? [y/N]: "):
         raise InstallerError("uninstall cancelled")
 
-    original_files = {relative: _destination(home, relative).read_bytes() for relative in state.files}
+    _assert_uninstall_current(home, state, allowed)
+    _validate_existing_owned_files(home, state)
+    # Record only files actually removed by this operation, never all manifest entries.
+    removed: dict[str, bytes] = {}
     manifest = _manifest_path(home)
     try:
         for relative in sorted(state.files):
+            _assert_uninstall_current(home, state, allowed)
             target = _destination(home, relative)
-            if _is_symlink(target) or sha256_bytes(target.read_bytes()) != state.files[relative]:
+            content = _require_regular_file(target, f"managed file {relative}")
+            if sha256_bytes(content) != state.files[relative]:
                 raise ConflictError(f"managed file changed during uninstall: {target}")
             target.unlink()
-        skill_directory = home / "skills" / "codex-balanced-agents"
-        try:
-            skill_directory.rmdir()
-        except OSError:
-            pass
+            removed[relative] = content
+        _assert_uninstall_current(home, state, allowed)
         _atomic_write(manifest, _uninstalled_manifest_bytes(state.preset or "balanced"))
     except Exception as exc:
         rollback_errors: list[str] = []
-        for relative, content in original_files.items():
-            target = _destination(home, relative)
-            if not target.exists():
-                try:
-                    _ensure_directory(target.parent, [])
-                    _atomic_write(target, content)
-                except Exception as rollback_exc:  # pragma: no cover - exceptional disk failure path
-                    rollback_errors.append(f"{relative}: {rollback_exc}")
-        message = f"uninstall failed and managed files were restored: {exc}"
+        for relative, content in removed.items():
+            try:
+                _assert_destination_layout(home, state)
+                target = _destination(home, relative)
+                # Exclusive creation preserves any file/symlink added after deletion.
+                with target.open("xb") as handle:
+                    handle.write(content)
+            except Exception as rollback_exc:
+                rollback_errors.append(f"{relative}: {rollback_exc}")
+        message = f"uninstall failed: {exc}"
         if rollback_errors:
-            message += "; manual recovery may be needed: " + "; ".join(rollback_errors)
+            message += "; rollback incomplete; manual recovery needed: " + "; ".join(rollback_errors)
+        else:
+            message += "; files removed by this operation were restored"
         raise InstallerError(message) from exc
+    # Best-effort empty-directory cleanup only after the manifest commit.
+    skill_directory = home / "skills" / "codex-balanced-agents"
+    try:
+        _assert_destination_layout(home, state)
+        skill_directory.rmdir()
+    except (OSError, InstallerError):
+        pass
     print("uninstalled managed preset files; backups and inactive owner manifest were retained locally")
     return 0
 
@@ -860,6 +895,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     uninstall = subparsers.add_parser("uninstall", help="remove verified managed files")
     uninstall.add_argument("--codex-home", dest="codex_home", default=argparse.SUPPRESS)
+    uninstall.add_argument("--dry-run", action="store_true", help="verify and list removals without writing")
     uninstall.add_argument("--yes", action="store_true", help="skip the removal review prompt")
     uninstall.set_defaults(handler=command_uninstall)
 

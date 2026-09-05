@@ -22,6 +22,16 @@ Run locally with Python 3.11+:
 python3 -m unittest discover -s tests -v
 ```
 
+## Uninstall boundary checks / 卸载边界检查
+
+The updated suite passed 25 tests locally on macOS. New cases cover removal preview and cancellation, preserving unrelated settings/roles/skills/backups and user-added files, repeated uninstall and reinstall, rejection of unrelated manifest paths, modified/missing files, symlinked destinations/state, changes during confirmation, manifest changes before commit, commit failure rollback, and preservation of replacement files during rollback. These checks use temporary Codex homes; no real user installation is removed. The updated uninstall paths have not been rerun on Linux or Windows.
+
+更新后的测试在 macOS 本机通过，共 25 项。新增覆盖预览与取消、无关配置／角色／技能／备份及额外文件保留、重复卸载与重装、清单越界、文件修改或缺失、符号链接、确认期间的修改、提交前清单变化、提交失败恢复以及恢复时保留后来出现的文件。均使用临时目录，没有卸载真实用户配置；本次更新尚未在 Linux 或 Windows 重跑。
+
+Both presets also passed subprocess-based CLI install → removal preview → uninstall → status → repeated uninstall checks in temporary homes, with an unrelated configuration file remaining byte-identical.
+
+两套方案还通过了子进程 CLI 的安装 → 卸载预览 → 卸载 → 状态 → 重复卸载检查，全程使用临时目录，无关配置文件逐字节保持一致。
+
 ## Version-specific role behavior / 角色加载的版本依据
 
 Examined installed CLI **0.149.1** and desktop-bundled CLI **0.153.4**, and their matching tagged source. Modern CLI discovery accepts standalone agent TOML files without duplicated `config.toml` registrations.

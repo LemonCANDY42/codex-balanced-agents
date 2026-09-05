@@ -44,6 +44,20 @@ The installer asks once for the preset and once to review the installation. If m
 
 It installs role files and one routing skill under your Codex home. It does **not** replace your main model, `config.toml`, global `AGENTS.md`, authentication, or MCP configuration. Existing unmanaged role files are conflicts, even when their contents happen to match. [Installation details, updates and removal →](INSTALL.md)
 
+## Uninstall with your agent
+
+Paste this into Codex:
+
+```text
+Read https://raw.githubusercontent.com/LemonCANDY42/codex-balanced-agents/main/UNINSTALL.md
+and uninstall Codex Balanced Agents from the same Codex home used for installation.
+Preview the exact removals first, then remove only verified package-owned files.
+Preserve unrelated configuration and user modifications; stop on any conflict.
+```
+
+Or, from this repository: `python3 install.py uninstall --yes`.
+Use `--dry-run` to preview without changes. [Removal boundaries and recovery →](UNINSTALL.md)
+
 ## Use it on a real task
 
 After installation, restart your Codex client and try:
