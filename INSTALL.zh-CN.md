@@ -46,12 +46,11 @@ python3 install.py install --preset quality --yes --allow-unverified-models
 ```text
 <codex-home>/
   agents/                              所选方案的 14 个角色
-  skills/codex-balanced-agents/SKILL.md 使用与选择指导
   codex-balanced-agents/manifest.json 所有权与文件哈希
   codex-balanced-agents/backups/      更新前的已管理版本
 ```
 
-技能提供选择指导，不会自动启动代理团队。现代 Codex 自动发现独立 TOML 角色，无需向 `config.toml` 追加角色注册。
+不安装额外技能。现代 Codex 自动发现独立 TOML 角色，角色描述供主代理判断，不规定工作流程；无需向 `config.toml` 追加角色注册。
 
 安装器写入前检查所有目标，拒绝接管不归它管理的同名文件、覆盖修改过的已管理文件或写入符号链接目标。`config.toml`、`AGENTS.md`、认证和 MCP 不属于它管理的内容。dry run 不写入本项目文件或状态；被调用的 Codex 进程可能维护自己的常规缓存／日志。
 
@@ -69,14 +68,24 @@ python3 install.py install --preset quality --yes --allow-unverified-models
 
 在干净的仓库目录中拉取并检查更新，再执行安装器。只有哈希仍匹配所有权记录的文件才会更新。
 
+若已安装版本包含旧项目技能，直接更新会在写入前停止。请用当前仓库预览并卸载旧包，再安装所选预设。卸载器仅在归属与哈希验证通过后删除旧技能；修改过的文件需要明确处理冲突。新安装不会检查或管理无关技能目录。
+
+```bash
+python3 install.py uninstall --dry-run
+python3 install.py uninstall
+python3 install.py install --preset balanced
+```
+
+已经仅安装角色的版本，仍可按原方式切换与卸载：
+
 ```bash
 python3 install.py install --preset quality
 python3 install.py status
 python3 install.py uninstall
 ```
 
-卸载只删除未被修改的已管理角色／技能文件，保留本机备份与停用状态记录。若你修改了已管理文件，先另外保存定制版本，再明确处理冲突；安装器不会擅自覆盖或删除它。不要通过删除 manifest 来强行更新。
+卸载只删除未被修改的已管理角色文件（以及旧版本安装中经验证的项目技能），保留本机备份与停用状态记录。若你修改了已管理文件，先另外保存定制版本，再明确处理冲突；安装器不会擅自覆盖或删除它。不要通过删除 manifest 来强行更新。
 
 一键卸载、agent 执行步骤、预览与确切保留边界见[卸载指南](UNINSTALL.zh-CN.md)。
 
-若只想在单个项目使用，可手工把一套 TOML 放到 `.codex/agents/`，把使用技能放到 `.agents/skills/`。这条手工路径不归全局安装器管理，需要检查项目信任设置，并使用项目原有版本控制流程。
+若只想在单个项目使用，可手工把一套 TOML 放到 `.codex/agents/`。先检查同名文件，已有文件不要覆盖；通过项目原有版本控制流程记录新增路径和来源版本，便于核对与卸载。这条手工路径不归全局安装器管理，需要检查项目信任设置。卸载见[项目内手工安装](UNINSTALL.zh-CN.md#项目内手工安装)。

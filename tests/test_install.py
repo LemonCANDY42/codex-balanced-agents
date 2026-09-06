@@ -97,7 +97,7 @@ class InstallerTest(unittest.TestCase):
         )
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self.assertEqual(manifest["preset"], "balanced")
-        self.assertEqual(len(manifest["files"]), 15)
+        self.assertEqual(len(manifest["files"]), 14)
         backups = self.home / installer.STATE_DIR_NAME / "backups"
         self.assertEqual(len(list(backups.iterdir())), 1)
 
@@ -108,6 +108,108 @@ class InstallerTest(unittest.TestCase):
         self.assertEqual(manifest_path.read_bytes(), before_repeat)
         self.assertEqual(len(list(backups.iterdir())), 1)
         self.assertNotEqual(quality_manifest, manifest_path.read_bytes())
+
+    def seed_legacy_install(self) -> Path:
+        self.assertEqual(self.install("quality")[0], 0)
+        skill = self.home / installer.LEGACY_SKILL_REL
+        skill.parent.mkdir(parents=True)
+        skill.write_bytes(b"legacy managed skill fixture")
+        manifest = self.home / installer.STATE_DIR_NAME / "manifest.json"
+        data = json.loads(manifest.read_bytes())
+        data["files"].append({"path": installer.LEGACY_SKILL_REL,
+                              "sha256": installer.sha256_bytes(skill.read_bytes())})
+        manifest.write_text(json.dumps(data), encoding="utf-8")
+        return skill
+
+    def test_fresh_install_owns_only_fourteen_roles(self) -> None:
+        code, output, err = self.install("quality", "--dry-run")
+        self.assertEqual((code, err), (0, ""))
+        self.assertNotIn("skills/", output)
+        self.assertFalse(self.home.exists())
+        self.assertEqual(self.install("quality")[0], 0)
+        data = json.loads((self.home / installer.STATE_DIR_NAME / "manifest.json").read_bytes())
+        self.assertEqual(len(data["files"]), 14)
+        self.assertTrue(all(entry["path"].startswith("agents/") for entry in data["files"]))
+        self.assertFalse((self.home / "skills").exists())
+
+    def test_roles_only_lifecycle_never_inspects_unrelated_skills(self) -> None:
+        skill = self.home / installer.LEGACY_SKILL_REL
+        skill.parent.mkdir(parents=True)
+        skill.write_bytes(b"unmanaged same-name skill")
+        original_lstat = installer._lstat
+
+        def reject_skill_inspection(path):
+            if path == self.home / "skills" or self.home / "skills" in path.parents:
+                raise AssertionError(f"inspected unrelated skill path: {path}")
+            return original_lstat(path)
+
+        with mock.patch.object(installer, "_lstat", side_effect=reject_skill_inspection):
+            self.assertEqual(self.install("quality")[0], 0)
+            self.assertEqual(self.install("balanced")[0], 0)
+            self.assertEqual(self.invoke("status", "--codex-home", str(self.home))[0], 0)
+            self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 0)
+            self.assertEqual(self.install("balanced")[0], 0)
+        self.assertEqual(skill.read_bytes(), b"unmanaged same-name skill")
+
+    @unittest.skipIf(os.name == "nt", "symlinks may require Windows privileges")
+    def test_roles_only_accepts_unrelated_symlinked_skills_directory(self) -> None:
+        self.home.mkdir()
+        outside = self.root / "outside-skills"
+        outside.mkdir()
+        (outside / "keep.txt").write_bytes(b"unrelated")
+        (self.home / "skills").symlink_to(outside, target_is_directory=True)
+        self.assertEqual(self.install("quality")[0], 0)
+        self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 0)
+        self.assertTrue((self.home / "skills").is_symlink())
+        self.assertEqual(list(outside.iterdir()), [outside / "keep.txt"])
+
+    def test_legacy_requires_uninstall_then_roles_only_reinstall(self) -> None:
+        skill = self.seed_legacy_install()
+        notes = skill.parent / "notes.txt"
+        notes.write_bytes(b"personal notes")
+        before = self.snapshot()
+        code, _, err = self.install("balanced")
+        self.assertEqual(code, 2)
+        self.assertIn("verified old package first", err)
+        self.assertEqual(self.snapshot(), before)
+        code, out, err = self.invoke("uninstall", "--dry-run", "--codex-home", str(self.home))
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn("remove " + installer.LEGACY_SKILL_REL, out)
+        self.assertEqual(self.snapshot(), before)
+        self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 0)
+        self.assertFalse(skill.exists())
+        self.assertEqual(notes.read_bytes(), b"personal notes")
+        self.assertEqual(self.install("balanced")[0], 0)
+        self.assertFalse(skill.exists())
+        data = json.loads((self.home / installer.STATE_DIR_NAME / "manifest.json").read_bytes())
+        self.assertEqual(len(data["files"]), 14)
+
+    def test_modified_legacy_skill_refuses_uninstall_without_deletion(self) -> None:
+        skill = self.seed_legacy_install()
+        skill.write_bytes(b"user customization")
+        before = self.snapshot()
+        code, _, err = self.invoke("uninstall", "--yes", "--codex-home", str(self.home))
+        self.assertEqual(code, 2)
+        self.assertIn("modified", err)
+        self.assertEqual(self.snapshot(), before)
+
+    @unittest.skipIf(os.name == "nt", "symlinks may require Windows privileges")
+    def test_legacy_uninstall_rejects_each_symlinked_skill_component(self) -> None:
+        skill = self.seed_legacy_install()
+        for relative in ["skills", "skills/codex-balanced-agents", installer.LEGACY_SKILL_REL]:
+            with self.subTest(relative=relative):
+                target = self.home / relative
+                moved = self.root / "outside"
+                target.rename(moved)
+                target.symlink_to(moved, target_is_directory=moved.is_dir())
+                before = self.snapshot()
+                code, _, err = self.invoke("uninstall", "--yes", "--codex-home", str(self.home))
+                self.assertEqual(code, 2)
+                self.assertIn("symlink", err)
+                self.assertEqual(self.snapshot(), before)
+                target.unlink()
+                moved.rename(target)
+        self.assertEqual(skill.read_bytes(), b"legacy managed skill fixture")
 
     def test_conflict_preflight_does_not_partially_install(self) -> None:
         external = self.home / "agents" / "explore_astra.toml"
@@ -310,8 +412,8 @@ class InstallerTest(unittest.TestCase):
         after = self.snapshot()
         self.assertEqual(self.invoke("uninstall", "--yes", "--codex-home", str(self.home))[0], 0)
         self.assertEqual(self.snapshot(), after)
-        # An unmanaged directory remaining after uninstall is deliberately not adopted.
-        self.assertEqual(self.install("balanced")[0], 2)
+        # Unrelated skill directories neither block nor become owned by installation.
+        self.assertEqual(self.install("balanced")[0], 0)
 
     def test_uninstall_reinstall_without_custom_skill_files(self) -> None:
         self.assertEqual(self.install("quality")[0], 0)
@@ -354,7 +456,7 @@ class InstallerTest(unittest.TestCase):
         def change_before_commit(home, state, allowed):
             nonlocal count
             count += 1
-            if count == 17:  # initial check + 15 removals + commit check
+            if count == 16:  # initial check + 14 removals + commit check
                 manifest.write_bytes(replacement)
             original(home, state, allowed)
         with mock.patch.object(installer, "_assert_uninstall_current", side_effect=change_before_commit):
@@ -384,7 +486,7 @@ class InstallerTest(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("rollback incomplete", err)
         self.assertEqual(target.read_bytes(), b"new user file")
-        self.assertTrue((self.home / installer.SKILL_REL).is_file())
+        self.assertTrue((self.home / "agents/explore_luna.toml").is_file())
 
     def test_uninstall_missing_file_fails_before_deletion(self) -> None:
         self.assertEqual(self.install("balanced")[0], 0)
@@ -396,7 +498,7 @@ class InstallerTest(unittest.TestCase):
     @unittest.skipIf(os.name == "nt", "symlinks may require Windows privileges")
     def test_uninstall_rejects_symlinked_destination_and_state(self) -> None:
         self.assertEqual(self.install("balanced")[0], 0)
-        for relative in ["agents", "skills", "skills/codex-balanced-agents",
+        for relative in ["agents",
                          "agents/worker_astra.toml", "codex-balanced-agents",
                          "codex-balanced-agents/manifest.json"]:
             with self.subTest(relative=relative):

@@ -3,7 +3,7 @@
 This repository ships two personal Codex role presets and a non-clobbering installer.
 
 - `presets/quality/agents` and `presets/balanced/agents` own the installed role definitions. Keep their names, instructions and scope aligned; only documented model/effort choices may differ.
-- `skills/codex-balanced-agents/SKILL.md` owns the lead's role-selection guidance. This root file is for repository maintenance, never installed as a user's global AGENTS.md.
+- Role files describe capabilities and boundaries; the lead chooses when and how to delegate. Ship native roles only, without an installed routing skill or global instruction overrides. This file is repository maintenance guidance, never installed into a user's global AGENTS.md.
 - `install.py` owns file installation, model catalogue checks and uninstall. Never add authentication handling, model inference, telemetry, automatic upgrades, or broad config replacement to installation.
 - Installation asks at most two questions: preset and consolidated review/missing-model handling. No silent model substitution.
 - Keep English and Chinese README/install guides synchronized. Keep claims scoped to recorded evidence; do not infer savings or task quality from reasoning effort alone.

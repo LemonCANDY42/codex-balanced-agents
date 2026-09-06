@@ -46,12 +46,11 @@ The destination defaults to `$CODEX_HOME`, otherwise `~/.codex`. Override it wit
 ```text
 <codex-home>/
   agents/                              14 selected role files
-  skills/codex-balanced-agents/SKILL.md role-selection guidance
   codex-balanced-agents/manifest.json  installer ownership and hashes
   codex-balanced-agents/backups/       prior managed versions after updates
 ```
 
-The installed skill only guides use; it does not automatically start a team. Modern Codex discovers standalone agent TOML files. No `[agents.<role>]` registrations are added to `config.toml`.
+No skill is installed. Modern Codex discovers standalone agent TOML files; their descriptions inform the lead without imposing a workflow. No `[agents.<role>]` registrations are added to `config.toml`.
 
 The installer checks every target before writing. It refuses unmanaged files, modified managed files, and symlinked package destinations. Existing `config.toml`, `AGENTS.md`, auth and MCP files are not part of its ownership. A dry run does not write package files or state; the invoked Codex process may maintain its own normal cache/log files.
 
@@ -69,14 +68,25 @@ For offline inspection/testing, `--models-file capture.json` accepts a JSON `mod
 
 Pull changes into a clean checkout, inspect them, and rerun the installer. It only updates files whose hashes still match its ownership record.
 
+If the existing installation includes the old package skill, direct updates stop before writing. Use the current checkout to preview and uninstall the old package, then install the chosen preset again. The uninstaller verifies ownership and hashes before removing the legacy skill; modified files require deliberate conflict resolution. New installations do not inspect or manage unrelated skill directories.
+
+```bash
+python3 install.py uninstall --dry-run
+python3 install.py uninstall
+python3 install.py install --preset balanced
+```
+
+
+For an existing roles-only installation, normal switching and removal remain:
+
 ```bash
 python3 install.py install --preset quality
 python3 install.py status
 python3 install.py uninstall
 ```
 
-Uninstall removes only unchanged managed role/skill files and retains backups plus an inactive manifest. If you have edited a managed file, save your customization elsewhere and resolve the reported conflict deliberately; the installer will not overwrite or delete it for you. Do not delete the ownership manifest to force an update.
+Uninstall removes only unchanged managed role files (and the verified package skill from a legacy installation) and retains backups plus an inactive manifest. If you have edited a managed file, save your customization elsewhere and resolve the reported conflict deliberately; the installer will not overwrite or delete it for you. Do not delete the ownership manifest to force an update.
 
 For one-command removal, agent instructions, preview and exact preservation boundaries, see [Uninstall](UNINSTALL.md).
 
-For a project-only setup, manually copy one preset's TOML files into `.codex/agents/` and the routing skill into `.agents/skills/`. This manual path is not tracked by the global installer. Check the project's trust settings and use its normal version-control process.
+For a project-only setup, manually copy one preset's TOML files into `.codex/agents/`. Check for existing same-name files first and do not overwrite them. Record the added paths and selected source revision in the project's normal version-control process so removal is reviewable. This manual path is not tracked by the global installer; check the project's trust settings. See [project-only removal](UNINSTALL.md#project-only-manual-installations).

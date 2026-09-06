@@ -2,7 +2,7 @@
 
 [English README](../README.md) · [中文 README](../README.zh-CN.md)
 
-Evidence date: **2026-09-05**. This file separates package checks, client behavior and task-quality evidence.
+Latest package evidence: **2026-09-06**; runtime observations below remain dated **2026-09-05**. This file separates package checks, client behavior and task-quality evidence.
 
 ## Package checks / 文件与安装检查
 
@@ -22,11 +22,25 @@ Run locally with Python 3.11+:
 python3 -m unittest discover -s tests -v
 ```
 
+## Roles-only update, 2026-09-06 / 仅安装角色更新
+
+The current macOS suite passed **31 tests**. New checks verify 14-role installation without a skills directory, preservation of unrelated and symlinked skill directories across install/update/status/uninstall, refusal to directly update a legacy role-plus-skill installation, verified legacy uninstall followed by roles-only reinstall, and refusal to remove modified or symlinked legacy skill files. No real user installation was removed.
+
+本次 macOS 测试通过 **31 项**。新增验证仅安装 14 个角色且不创建技能目录；安装、更新、状态检查与卸载均保留无关技能及其符号链接目录；旧版“角色加技能”安装不能直接覆盖更新，需验证卸载后重装；修改过的旧技能或符号链接路径会阻止删除。没有卸载真实用户配置。
+
+Both presets also passed a subprocess CLI check starting from the previous published installer: install 15 managed files, refuse direct update without changing the manifest, preview/uninstall the verified legacy package, install 14 roles, check status, and uninstall again. Unrelated configuration remained byte-identical. These checks used temporary homes and a synthetic model catalogue, not live model inference.
+
+两套预设还使用上一版已发布安装器完成子进程 CLI 验证：先安装 15 个受管理文件，确认直接更新拒绝且清单不变，再预览／卸载旧包、安装 14 个角色、检查状态并再次卸载。无关配置逐字节不变。验证使用临时目录与模拟模型目录，没有发起真实模型推理。
+
+All role names, models and reasoning defaults are unchanged. Descriptions and instructions now leave delegation and role/context selection to the lead, while retaining authorization, read-only and verification boundaries. This is source/configuration evidence plus an independent review; the revised prompts have not been benchmarked for model behavior or savings. Linux and Windows have not been rerun for this update.
+
+角色名称、模型与推理默认值均未改变。新版说明把委派及角色／上下文选择交给主代理，并保留授权、只读与验证边界。这些是源码与配置核对及独立审查证据，尚未对新版提示词做行为或节省额度的基准测试；此次更新尚未在 Linux、Windows 重跑。
+
 ## Uninstall boundary checks / 卸载边界检查
 
-The updated suite passed 25 tests locally on macOS. New cases cover removal preview and cancellation, preserving unrelated settings/roles/skills/backups and user-added files, repeated uninstall and reinstall, rejection of unrelated manifest paths, modified/missing files, symlinked destinations/state, changes during confirmation, manifest changes before commit, commit failure rollback, and preservation of replacement files during rollback. These checks use temporary Codex homes; no real user installation is removed. The updated uninstall paths have not been rerun on Linux or Windows.
+The 2026-09-05 suite passed 25 tests locally on macOS. New cases cover removal preview and cancellation, preserving unrelated settings/roles/skills/backups and user-added files, repeated uninstall and reinstall, rejection of unrelated manifest paths, modified/missing files, symlinked destinations/state, changes during confirmation, manifest changes before commit, commit failure rollback, and preservation of replacement files during rollback. These checks use temporary Codex homes; no real user installation is removed. The updated uninstall paths have not been rerun on Linux or Windows.
 
-更新后的测试在 macOS 本机通过，共 25 项。新增覆盖预览与取消、无关配置／角色／技能／备份及额外文件保留、重复卸载与重装、清单越界、文件修改或缺失、符号链接、确认期间的修改、提交前清单变化、提交失败恢复以及恢复时保留后来出现的文件。均使用临时目录，没有卸载真实用户配置；本次更新尚未在 Linux 或 Windows 重跑。
+2026-09-05 的测试在 macOS 本机通过，共 25 项。新增覆盖预览与取消、无关配置／角色／技能／备份及额外文件保留、重复卸载与重装、清单越界、文件修改或缺失、符号链接、确认期间的修改、提交前清单变化、提交失败恢复以及恢复时保留后来出现的文件。均使用临时目录，没有卸载真实用户配置；本次更新尚未在 Linux 或 Windows 重跑。
 
 Both presets also passed subprocess-based CLI install → removal preview → uninstall → status → repeated uninstall checks in temporary homes, with an unrelated configuration file remaining byte-identical.
 
@@ -67,9 +81,9 @@ The child session records showed:
 | Balanced | `reviewer_sol` | `gpt-5.6-sol` | `high` | Reported a concrete trigger, wrong result and requirement violation |
 | Quality | `explore_luna` | `gpt-5.6-luna` | `xhigh` | Correctly identified the same error |
 
-The source function remained unchanged. The recorded child permissions inherited the read-only parent. This verifies sampled role loading and execution, not that role instructions can constrain a full-access parent. Other role/model combinations were not individually executed. The test requested roles explicitly and restricted the skill-catalogue budget; it does not verify implicit routing-skill activation. No private session logs or authentication files are included in the repository.
+The source function remained unchanged. The recorded child permissions inherited the read-only parent. This verifies sampled role loading and execution, not that role instructions can constrain a full-access parent. Other role/model combinations were not individually executed. The test requested roles explicitly and restricted the skill-catalogue budget; it did not verify implicit routing-skill activation (the skill has since been removed from the package). No private session logs or authentication files are included in the repository.
 
-使用桌面捆绑的 0.153.4 在临时 Codex 目录启动了两个新会话，均列出了 14 个自定义角色。子会话记录确认上表模型与档位；示例错误被正确指出，源文件未变。父会话明确设为只读，这不证明角色能限制全权限父会话。未逐一执行全部角色，也未验证技能的隐式触发；仓库没有收录私有会话日志或认证文件。
+使用桌面捆绑的 0.153.4 在临时 Codex 目录启动了两个新会话，均列出了 14 个自定义角色。子会话记录确认上表模型与档位；示例错误被正确指出，源文件未变。父会话明确设为只读，这不证明角色能限制全权限父会话。未逐一执行全部角色，也未验证当时技能的隐式触发（项目现已移除该技能）；仓库没有收录私有会话日志或认证文件。
 
 ## Task-quality evidence / 任务效果
 

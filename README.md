@@ -4,7 +4,7 @@
 
 **A personal Codex setup for matching subagents to the task.**
 
-Small, clear jobs go to lighter models. Dense implementation gets a bounded Worker. Ambiguous problems get deeper investigation. A separate Reviewer checks the candidate against the original request.
+Small, clear jobs go to lighter models. Dense implementation gets a bounded Worker. Ambiguous problems get deeper investigation. An independent Reviewer can check the candidate when risk or verification benefit warrants it.
 
 This repository packages that approach as **14 native Codex roles, two presets, and one installer**. It is for individual developers who want an understandable starting point they can inspect and adapt.
 
@@ -12,7 +12,7 @@ This repository packages that approach as **14 native Codex roles, two presets, 
 
 ## Start with the task
 
-Start with **Balanced** if you do not have a preference. It gives the four routine Luna/Terra Explore and Worker roles a `medium` reasoning-effort default; **Quality** retains their `xhigh` defaults. The presets otherwise install the same role names, instructions, escalation paths and scope boundaries. The names describe preset choices, not measured quality, cost or speed.
+Start with **Balanced** if you do not have a preference. It gives the four routine Luna/Terra Explore and Worker roles a `medium` reasoning-effort default; **Quality** retains their `xhigh` defaults. The presets otherwise install the same role names, instructions, selection guidance and scope boundaries. The names describe preset choices, not measured quality, cost or speed.
 
 Choose the role again for each delegated outcome. An installed role has a fixed model and reasoning-effort default; this package has no adaptive-effort mechanism or router. Matching Explore and Worker defaults do not require the same model or effort choice across phases, and installing either preset does not change the lead model. [How to read the exact defaults and select a role →](docs/roles.md)
 
@@ -37,7 +37,7 @@ python3 install.py install
 
 The installer asks once for the preset and once to review the installation. If model requirements are missing or cannot be checked, the second question lets you cancel or explicitly install the unchanged files knowing those roles may not run. It never asks model by model.
 
-It installs role files and one routing skill under your Codex home. It does **not** replace your main model, `config.toml`, global `AGENTS.md`, authentication, or MCP configuration. Existing unmanaged role files are conflicts, even when their contents happen to match. [Installation details, updates and removal →](INSTALL.md)
+It installs only the 14 native role files, plus local installer ownership records. No skill or ongoing workflow instructions are installed. It does **not** replace your main model, `config.toml`, global `AGENTS.md`, authentication, or MCP configuration. Existing unmanaged role files are conflicts, even when their contents happen to match. [Installation details, updates and removal →](INSTALL.md)
 
 ## Uninstall with your agent
 
@@ -53,24 +53,21 @@ Preserve unrelated configuration and user modifications; stop on any conflict.
 Or, from this repository: `python3 install.py uninstall --yes`.
 Use `--dry-run` to preview without changes. [Removal boundaries and recovery →](UNINSTALL.md)
 
-## Use it on a real task
+## After installation
 
-After installation, restart your Codex client and try:
+Restart Codex so the native roles are discoverable. Ask for the outcome you need and, when appropriate, authorize delegation:
 
 ```text
-Use $codex-balanced-agents for this bug. Have explore_terra locate the owning
-code and return evidence when bounded synthesis is needed. If it establishes a
-clear mechanical edit, have worker_luna implement only that edit and validate it.
-Have reviewer_sol inspect the finished diff against the original requirement.
-Keep integration and final acceptance with you. Preserve unrelated changes.
+Fix this bug. Use the installed subagents only where they help; choose the role
+and context needed for the task. Preserve unrelated work and verify the result.
 ```
 
-You do not need all 14 roles on every task. Work directly when delegation would add more coordination than value. The installed skill supplies selection guidance; your prompt or project guidance authorizes delegation. There is no background router, custom agent runtime, or mandatory four-stage pipeline.
+The lead decides whether to delegate and how to use the available roles. There is no skill to invoke, required stage sequence, or background router. [Role reference →](docs/roles.md)
 
 ## What this setup tries to get right
 
 - **Separate uncertainty from execution.** Investigate missing ownership or lifecycle facts before asking a Worker to implement a guess.
-- **Make escalation specific.** A concrete blocker or difficult boundary can justify a stronger role. Task size alone does not.
+- **Choose for the task.** Role descriptions guide selection; they do not impose a sequence, a fixed UI model, or a failed attempt before using a deeper role.
 - **Keep scope visible.** Workers have an owning boundary and acceptance checks. A nearby defect is a finding, not permission for extra work.
 - **Make review useful.** Reviewers report a location, trigger, evidence and impact. They do not turn style preferences into new requirements.
 - **Keep the lead accountable.** Children return results; the lead integrates, resolves findings and verifies the outcome.

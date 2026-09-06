@@ -25,7 +25,8 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parent
 PRESETS = ("quality", "balanced")
-SKILL_REL = "skills/codex-balanced-agents/SKILL.md"
+# Uninstall compatibility only; new installs never manage a skill.
+LEGACY_SKILL_REL = "skills/codex-balanced-agents/SKILL.md"
 STATE_DIR_NAME = "codex-balanced-agents"
 MANIFEST_VERSION = 1
 CLIENT_INFO = {"name": "codex_balanced_agents", "version": "0.1.0"}
@@ -127,7 +128,7 @@ def _is_generic_owned_relative(relative_path: str) -> bool:
         safe = _safe_relative(relative_path)
     except InstallerError:
         return False
-    if safe == SKILL_REL:
+    if safe == LEGACY_SKILL_REL:
         return True
     parts = PurePosixPath(safe).parts
     return len(parts) == 2 and parts[0] == "agents" and parts[1].endswith(".toml")
@@ -251,9 +252,6 @@ def load_preset(preset: str) -> tuple[list[SourceFile], list[ModelRequirement]]:
         files.append(SourceFile(relative, content))
         requirements.append(_model_requirement(source.name, content))
 
-    skill_source = ROOT / "skills" / "codex-balanced-agents" / "SKILL.md"
-    content = _require_regular_file(skill_source, "installer skill")
-    files.append(SourceFile(SKILL_REL, content))
     return files, requirements
 
 
@@ -460,16 +458,14 @@ def _confirm(prompt: str) -> bool:
 
 def _assert_destination_layout(home: Path, state: ManagedState) -> None:
     _assert_no_symlink_components(home, "--codex-home")
-    for directory in (home / "agents", home / "skills", home / "skills" / "codex-balanced-agents"):
+    directories = [home / "agents"]
+    if LEGACY_SKILL_REL in state.files:
+        directories.extend((home / "skills", home / "skills" / "codex-balanced-agents"))
+    for directory in directories:
         if _is_symlink(directory):
             raise ConflictError(f"refusing symlink destination directory: {directory}")
         if directory.exists() and not directory.is_dir():
             raise ConflictError(f"destination path is not a directory: {directory}")
-    if not state.installed and (home / "skills" / "codex-balanced-agents").exists():
-        raise ConflictError(
-            "skill destination already exists outside this installer's owner manifest: "
-            f"{home / 'skills' / 'codex-balanced-agents'}"
-        )
 
 
 def _validate_existing_owned_files(home: Path, state: ManagedState) -> None:
@@ -487,7 +483,12 @@ def _validate_existing_owned_files(home: Path, state: ManagedState) -> None:
 
 def _preflight_install(home: Path, sources: list[SourceFile]) -> ManagedState:
     desired = {source.relative_path for source in sources}
-    state = _read_manifest(home, desired)
+    state = _read_manifest(home, desired | {LEGACY_SKILL_REL})
+    if LEGACY_SKILL_REL in state.files:
+        raise ConflictError(
+            "legacy installation includes a managed skill; run this installer's uninstall "
+            "to remove the verified old package first, then install the roles-only preset"
+        )
     _assert_destination_layout(home, state)
     _validate_existing_owned_files(home, state)
 
@@ -629,8 +630,6 @@ def apply_install(home: Path, preset: str, sources: list[SourceFile], state: Man
     try:
         _ensure_directory(home, created_directories)
         _ensure_directory(home / "agents", created_directories)
-        _ensure_directory(home / "skills", created_directories)
-        _ensure_directory(home / "skills" / "codex-balanced-agents", created_directories)
         _ensure_directory(home / STATE_DIR_NAME, created_directories)
         backup_path = _backup_previous(home, state, created_directories)
 
@@ -793,7 +792,7 @@ def _uninstall_allowed_paths() -> set[str]:
     # The manifest is an ownership record, not authority to name arbitrary roles.
     # Layout validation does not query Codex or require model access.
     layouts = _validate_source_layout()
-    return {f"agents/{path.name}" for path in layouts["balanced"]} | {SKILL_REL}
+    return {f"agents/{path.name}" for path in layouts["balanced"]} | {LEGACY_SKILL_REL}
 
 
 def _assert_uninstall_current(home: Path, state: ManagedState, allowed: set[str]) -> None:
@@ -856,12 +855,13 @@ def command_uninstall(args: argparse.Namespace) -> int:
             message += "; files removed by this operation were restored"
         raise InstallerError(message) from exc
     # Best-effort empty-directory cleanup only after the manifest commit.
-    skill_directory = home / "skills" / "codex-balanced-agents"
-    try:
-        _assert_destination_layout(home, state)
-        skill_directory.rmdir()
-    except (OSError, InstallerError):
-        pass
+    if LEGACY_SKILL_REL in state.files:
+        skill_directory = home / "skills" / "codex-balanced-agents"
+        try:
+            _assert_destination_layout(home, state)
+            skill_directory.rmdir()
+        except (OSError, InstallerError):
+            pass
     print("uninstalled managed preset files; backups and inactive owner manifest were retained locally")
     return 0
 

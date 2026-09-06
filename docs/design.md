@@ -26,9 +26,15 @@ For bounded research or implementation with a capable lead and clear instruction
 
 在主代理能力足够且指令清楚的范围明确的调研或实现中，作者常观察到更高推理档位耗时更长，却没有明显收益。在个人使用 GPT-5.6 的过程中，更大的模型或更高推理档位有时会扩大范围、加入过多测试，或引入回归。这些只是促成两套预设的个人观察，不是基准结果，也不是关于模型或推理档位的普遍结论。
 
-The 14 names make escalation choices visible. They are not a target number of agents per run. Keep tightly coupled work with one owner, and delegate independent evidence collection before parallelizing edits.
+The 14 names expose different capability and reasoning profiles. They are not a target number of agents per run. Keep tightly coupled work with one owner, and delegate independent evidence collection before parallelizing edits.
 
-14 个名称让选择与升级路径可见，不代表每次要启动 14 个代理。紧密耦合的任务保持单一负责人，优先考虑可独立验证的调查工作。
+14 个名称让不同能力与推理档位可见，不代表每次要启动 14 个代理。紧密耦合的任务保持单一负责人，优先考虑可独立验证的调查工作。
+
+## Lead judgment / 主代理判断
+
+Delegation, role selection, parallelism and context sharing are decisions for the lead. Descriptions indicate suitable work without mandatory UI routing, escalation ladders, or a fixed fresh-context preference. Preserve authorization, read-only scopes, concurrent work and evidence-based acceptance. A Worker may make design changes when the assignment authorizes them; it returns material scope changes to the lead.
+
+是否委派、角色选择、并行数量和上下文传递由主代理判断。角色说明提供适用场景，不强制 UI 路由、逐级升级或优先使用全新上下文。保留授权、只读范围、并发工作保护和有证据的验收边界；Worker 可以实施任务已授权的设计变更，涉及实质范围变化时返回主代理。
 
 ## How the tiers will evolve / 后续优化与分级
 
